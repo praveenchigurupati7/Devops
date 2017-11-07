@@ -1,0 +1,5 @@
+- name: Configure webserver with ngnix
+  hosts: webserver
+  tasks:
+    - name: install ngnix
+      apt: name=nginx update_cache=yes
