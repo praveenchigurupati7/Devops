@@ -1,0 +1,32 @@
+Ansible useful commands :
+============================
+
+Where Should I Put My ansible.cfg File? 
+Ansible looks for an ansible.cfg file in the following places, in this order: 
+1. File specified by the ANSIBLE_CONFIG environment variable 
+2. ./ansible.cfg (ansible.cfg in the current directory) 
+3. ~/.ansible.cfg (.ansible.cfg in your home directory) 
+4. /etc/ansible/ansible.cfg
+
+ansible.cfg:
+===========
+ansible.cfg file that specifies the location of the inventory file (hostfile), the user to SSH (remote_user), and the SSH private key (private_key_file).
+
+[root@sso-ansible-u200398 staging]# cat ansible.cfg
+[defaults]
+inventory = ./hosts
+
+
+hosts:
+=========
+[root@sso-ansible-u200398 staging]# cat hosts
+[webservers]
+korva04-P3081
+
+[dbservers]
+korva04-I5744
+
+[control]
+sso-ansible-u200398 ansible_connection=local
+
+=================

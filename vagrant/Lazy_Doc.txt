@@ -1,0 +1,33 @@
+=================================
+
+vagrant init bento/centos-7.3
+vagrant init bento/ubuntu-16.10
+
+config.vm.define "chef_client" do |client|
+      client.vm.hostname = "chef_client"
+   end
+  config.vm.define "client" do |client|
+    client.vm.hostname = "client"
+    config.vm.network "private_network", ip: "192.168.33.10"
+  end
+   
+============================================
+ 
+vagrant ssh-config => Output will be give ssh connection details
+C:\Git-Hub\vagrant\centos\vm1>vagrant ssh-config
+Host default
+  HostName 127.0.0.1
+  User vagrant
+  Port 2222
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentityFile C:/Git-Hub/vagrant/centos/vm1/.vagrant/machines/default/virtualbox/private_key
+  IdentitiesOnly yes
+  LogLevel FATAL
+  
+ Manually doing ssh like below ->
+ ssh vagrant@127.0.0.1 -p 2222 -i /Users/lorinhochstein/dev/ansiblebook/ch01/
+playbooks/.vagrant/machines/default/virtualbox/private_key 
+
+============================================
