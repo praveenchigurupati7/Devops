@@ -47,7 +47,9 @@ ansible commands:
 
 What is roles?
 Roles are ways of automatically loading certain vars_files, tasks, and handlers based on a known file structure.
- Example project structure:
+
+Example project structure:
+
 site.yml 
 webservers.yml 
 fooservers.yml 
@@ -73,4 +75,135 @@ In a playbook, it would look like this:
    - common 
    - webserver 
   
-====================================================================  
+==================================================================== 
+
+Important modules :
+
+1) acl :
+ #Grant user Joe read access to a file 
+ - acl: name=/etc/foo.conf entity=joe etype=user permissions="r" state=present
+ # Removes the acl for Joe on a specific file - acl: name=/etc/foo.conf entity=joe etype=user state=absent
+ 
+2) apt : Manages apt packages
+  # Update repositories cache and install "foo" package 
+  - apt: pkg=foo update_cache=yes
+  # Remove "foo" package 
+  - apt: pkg=foo state=absent
+  
+3) at: schedule the execution of command or script file
+  # Schedule a command to execute in 20 minutes as root. 
+    - at: command="ls -d / > /dev/null" count=20 units="minutes"
+  # Match a command to an existing job and delete the job. 
+   - at: command="ls -d / > /dev/null" state="absent"
+   # Schedule a command to execute in 20 minutes making sure it is unique in the queue. 
+   - at: command="ls -d / > /dev/null" unique=true count=20 units="minutes"
+
+4**) command : Executes a command on remote node
+   # Example from Ansible Playbooks 
+     - command: /sbin/shutdown -t now
+   # Run the command if the specified file does not exist 
+     - command: /usr/bin/make_database.sh arg1 arg2 creates=/path/to/database
+	 
+5**) copy : copy file from local box to remote location
+   # Example from Ansible Playbooks 
+     - copy: src=/srv/myfiles/foo.conf dest=/etc/foo.conf owner=foo group=foo mode=0644
+
+6**) debug : priint statement during execution
+    # prints statements during execution and can be useful for debugging variables or expressions without necessarily halting the playbook
+	
+	- debug: msg="System {{ inventory_hostname }} has gateway {{ ansible_default_ipv4.gateway }}" when: ansible_default_ipv4.gateway is defined
+
+7) docker : manage docker containers (Manage the life cycle of docker containers.)
+     #Start one docker container running tomcat in each host of the web group and bind tomcat’s listening port to 8080 on the host
+	 - hosts: web 
+	   sudo: yes 
+	   tasks: 
+	     - name: run tomcat servers 
+		   docker: image=centos command="service tomcat6 start" ports=8080
+		   
+8) docker_image : manage docker images (Create, check and remove docker images)
+   #Build docker image if required. Path should contains Dockerfile to build image:
+	- hosts: web 
+	  sudo: yes 
+	  tasks: 
+	    - name: check or build image 
+		  docker_image: path="/path/to/build/dir" name="my/app" state=present
+
+9) fail : fail with custom message, it can be used with when condition is not met.
+	# Example playbook using fail and when together 
+	- fail: msg="The system may not be provisioned according to the CMDB status." 
+	  when: cmdb_status != "to-be-staged"
+	  
+10) fetch : fetches a file from remote node.
+     This module works like copy, but in reverse, it is used for fetching files from remote and storing locally.
+	 # Store file into /tmp/fetched/host.example.com/tmp/somefile 
+	 - fetch: src=/tmp/somefile dest=/tmp/fetched
+	 
+11**) file : sets attributes of a files
+       Sets attributes of ?les, symlinks, and directories, or removes ?les/symlinks/directories
+	   - file: path=/etc/foo.conf owner=foo group=foo mode=0644
+
+12**) git : Deploy software from git checkouts.
+       Manage git checkouts of repositories to deploy ?les or software.
+     # Example git checkout from Ansible Playbooks 
+	  - git: repo=git://foosball.example.org/path/to/repo.git 
+	    dest=/srv/checkout 
+		version=release-0.22
+
+13) group : add or remove groups
+
+14**) include_vars : Load variables from ?les, dynamically within a task.
+      Load varaibles from yaml file dynamically during task run time.
+
+     # Conditionally decide to load in variables when x is 0, otherwise do not. 
+		- include_vars: contingency_plan.yml 
+		  when: x == 0
+
+15**) mount : controls active and con?gured mount points in /etc/fstab.
+		mount: name=/mnt/dvd src=/dev/sr0 fstype=iso9660 opts=ro state=present
+
+16) replace - Replace all instances of a particular string in a ?le using a back-referenced regular expression.
+	- replace: dest=/etc/apache/ports regexp=’^(NameVirtualHost|Listen)\s+80\s*$’ replace=’\1 127.0.0.
+	
+17**) script : Runs a local script on a remote node after transferring it
+     # Example from Ansible Playbooks 
+	  - script: /some/local/script.sh --some-arguments 1234
+	# Run a script that creates a file, but only if the file is not yet created 
+	- script: /some/local/create_file.sh --some-arguments 1234 creates=/the/created/file.txt
+
+18**)  service - Manage services.
+	# Example action to start service httpd, if not running 
+		- service: name=httpd state=started
+	# Example action to stop service httpd, if running 
+		- service: name=httpd state=stopped
+	# Example action to restart service httpd, in all cases 
+		- service: name=httpd state=restarted
+
+19**) shell - Execute commands in nodes.
+	# Execute the command in remote shell; stdout goes to the specified # file on the remote 
+	- shell: somescript.sh >> somelog.txt
+
+20)  uri - Interacts with webservices
+
+21) user : Manage user accounts
+
+22**)  wait_for - Waits for a condition before continuing
+	# wait until the file /tmp/foo is present before continuing 
+		- wait_for: path=/tmp/foo
+	# wait until the string "completed" is in the file /tmp/foo before continuing 
+		- wait_for: path=/tmp/foo search_regex=completed
+	# wait until the lock file is removed 
+		- wait_for: path=/var/lock/file.lock state=absent
+	# wait until the process is finished and pid was destroyed 
+		- wait_for: path=/proc/3466/status state=absent
+
+23)  yum - Manages packages with the yum package manager
+
+24**)   template - Templates a ?le out to a remote server
+     Templates are processed by the Jinja2 templating language 
+	 # Example from Ansible Playbooks 
+	 - template: src=/mytemplates/foo.j2 dest=/etc/file.conf owner=bin group=wheel mode=0644
+
+25**)  get_url - Downloads files from HTTP, HTTPS, or FTP to node
+	- name: download foo.conf get_url: url=http://example.com/path/file.conf dest=/etc/foo.conf mode=0440
+
