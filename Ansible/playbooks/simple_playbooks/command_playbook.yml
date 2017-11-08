@@ -1,0 +1,27 @@
+---
+- name: testing command module
+  hosts: all
+  tasks: 
+      - name: using ls command
+        command: ls -lrt
+
+- name: using multiple command modules
+  hosts: all
+  tasks:
+     - name: command module multiple commands
+       command: "touch {{ item }}"
+       with_items:
+         - hello.txt
+         - hello2.txt
+         - hello3.txt
+       args:
+         chdir: /root
+
+- name : using command module and displaying the exit status
+  hosts: all
+  tasks:
+    - name: command module with register
+      command: "date"
+      register: output
+    
+    - debug: msg="output of previous command is {{ output.stdout }}"

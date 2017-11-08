@@ -1,0 +1,6 @@
+---
+- name: playbook to demo copy module
+  hosts: all
+  tasks:
+    - name: copying file from local to remote
+      copy: src=/scratch/test.txt dest=/root/test.txt owner=root group=root mode=0777
