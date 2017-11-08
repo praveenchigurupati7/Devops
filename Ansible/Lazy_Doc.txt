@@ -30,3 +30,47 @@ korva04-I5744
 sso-ansible-u200398 ansible_connection=local
 
 =================
+
+ansible commands:
+ -> ansible webservers -m ping
+ 
+  ansible testserver -m command -a uptime 
+  
+  -a -> argument to the command
+  
+   -s > tell ansible to sudo as root
+   
+  -> To run playbook : ansible-playbook <playbook>
+
+==================================
+
+
+What is roles?
+Roles are ways of automatically loading certain vars_files, tasks, and handlers based on a known file structure.
+ Example project structure:
+site.yml 
+webservers.yml 
+fooservers.yml 
+roles/ 
+	common/ 
+		files/ 
+		templates/ 
+		tasks/ 
+		handlers/ 
+		vars/ 
+		meta/ 
+	webservers/ 
+		files/ 
+		templates/ 
+		tasks/ 
+		handlers/ 
+		vars/ 
+		meta/
+In a playbook, it would look like this: 
+--
+- hosts: webservers 
+  roles: 
+   - common 
+   - webserver 
+  
+====================================================================  
