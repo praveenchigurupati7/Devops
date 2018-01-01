@@ -1,0 +1,307 @@
+***********************************************************************
+Whoever update this file, add the version and description in below format
+
+Version of this file : owner : Description
+
+1.0 : Varun Korde : Included all interview questions related to linux but not properly organized
+
+
+***********************************************************************
+
+
+
+
+1. kernel version : uname -a
+2. current ip address : ifconfig, ip addr show eth0
+3) free disk space : df -ah
+4) Manage services on system : 
+service <name> start/stop/status
+systemctl status <service>
+5)How do you check the space in directory : du -sh <dirName>
+6)How would you check for open ports :
+netstat
+netstat -tulpn (tcp/udp - listening port
+7) how do you check cpu usage ?
+ps aux | grep ngnix
+top
+htop
+8)dealing with mounts?
+ls /mnt
+mount /dev/sda2 (harddrive partition) /mnt
+9) check for existing mounts ?
+mounts
+10) how to check number of cpu's?
+lscpu, cat /proc/cpuinfo
+11)ssh port forwarding?
+
+12) what is zombie process?
+child process where parent exited, but child is not released
+
+13) CPU consuming?
+TOP
+
+
+*******************************
+CMD Line Monitoring tools :
+*******************************
+q)What is the command to monitor network connections both incomming and outgoing as well as viewing routing table
+netstat
+
+q) Listing all ports (both TCP and UDP) 
+netstat -a 
+
+q) Listing TCP Ports connections
+netstat -at
+
+q) Listing all LISTENING Connections
+ netstat -l
+ 
+q) Listing all TCP Listening Ports
+netstat -lt
+
+q) Display Kernel IP routing table with netstat and route command. 
+netstat -r
+
+
+*)vmstat reports virtual memory statistics and is used to help identify performance bottlenecks.
+vmstat reports information about processes, memory, paging, block IO, traps, disks and cpu activity.
+
+->iostat reports CPU, disk I/O, and NFS statistics.
+->vmstat reports virtual memory statistics.
+->mpstat reports processors statictics.
+If vmstat and iostat commands are not available on your box, please install sysstat package
+
+q)List Active and Inactive Memory
+[root@tecmint ~]# vmstat -a
+procs -----------memory---------- ---swap-- -----io---- --system-- -----cpu-----
+r  b   swpd   free  inact active   si   so    bi    bo   in   cs us sy id wa st
+1  0      0 810420  97380  70628    0    0   115     4   89   79  1  6 90  3  0
+
+q) Execute vmstat ‘X’ seconds?
+vmstat 2 6
+
+q)Disks Statistics
+ vmstat -d
+ 
+q) Display CPU and I/O statistics
+iostat without arguments displays CPU and I/O statistics of all partitions as shown below.
+
+[root@tecmint ~]# iostat
+Linux 2.6.32-279.el6.i686 (tecmint.com)         09/03/2012      _i686_  (1 CPU)
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+0.12    0.01    1.54    2.08    0.00   96.24
+Device:            tps   Blk_read/s   Blk_wrtn/s   Blk_read   Blk_wrtn
+sda               3.59       161.02        13.48    1086002      90882
+dm-0              5.76       159.71        13.47    1077154      90864
+dm-1              0.05         0.38         0.00       2576          0
+
+
+*) top command displays processor activity of your Linux box and also displays tasks managed by kernel in real-time.
+it will show information like tasks, memory, cpu and swap
+
+
+*******************************
+Storage Management :
+********************************
+
+q) How to check list of partitions?
+[root@bvmlin56-a ~]# cat /proc/partitions
+major minor  #blocks  name
+
+   8     0   62914560 sda
+   8     1     104391 sda1
+   8     2   41833260 sda2
+ 253     0   37715968 dm-0
+ 253     1    4096000 dm-1
+
+ 
+ or using command lsblk
+ 
+
+lsblk
+-> List, create, delete, and modify storage partitions.
+partitioning with fdisk, gdisk and parted
+
+q) How many partitions we can create?
+4 primary partitions
+And 
+
+q) Different types of partition tools?
+fdisk, gdisk and parted
+
+q)How to create partition using fdisk?
+fdisk <diskName>(eg, /dev/sdb)
+option ->n (for new)
+option -> p (for primary and e for extended)
+option -> w (to write)
+use lsblk to check disks and partitions
+
+q) How to wipe the partition table?
+using dd (disk duplicator)
+(if stands for input file, of stands for output file and bs stands for block size in bytes)
+dd if=/dev/zero of=/dev/sbd count=1 bs=512
+
+q)diff between fdisk and gdisk?
+ fdisk gives you an (MBR)Master boot record or dos partition table and gdisk gives you a GPT partition table
+ gdisk manages only GPT partition tables, while fdisk manages only classic MBR partition tables
+ if you buy a drive larger than 2TB and want to only have a single primary partition on it, you'll need to format it with a GPT partition.
+ 
+Creating Linux file systems :
+->create EXT4 file systems
+-> create XFS file systems
+-> Mount and unmount file systems
+
+mkfs -t or
+mkfs.ext4 -L DATA /dev/sdb4
+
+to change the label of the file system :
+tune2fs -L MYDATA -c 0 -i 0 /dev/sdb6
+
+to look the metadata of the fs :
+dumpe2fs /dev/sdb6
+
+mkfs.xfs -b size=1k -l size=10m /dev/sdb6
+
+mount -o remount,noexec /dev/sdb6 /data/mydata
+
+Managing swap and RAID devices
+==============================
+q) What is swap space?
+Swap space in Linux is used when the amount of physical memory (RAM) is full. If the system needs more memory resources and the RAM is full, inactive pages in memory are moved to the swap space. While swap space can help machines with a small amount of RAM, it should not be considered a replacement for more RAM
+
+Swap should equal 2x physical RAM for up to 2 GB of physical RAM, and then an additional 1x physical RAM for any amount above 2 GB, but never less than 32 MB.
+
+
+
+mkswap /dev/sdb5
+
+Enable the swap partition for usage using swapon command as shown below.
+
+# swapon /dev/sdc1
+
+Verify whether the newly created swap area is available for your use.
+swapon -s (swap summary)
+
+To remove the swap space?
+swapoff /dev/sdb5
+
+
+RAID:
+Usually used to create fault tolerant disk arrays
+Multiple drives or disks for better performance and or better reliability
+
+RAID 0: About speed, but nothing to do with reliabiility - fast
+RAID 1 : reliability, redundancy of 2 drives , no performance (safe)
+RAID 4/5/6 : Three or more devices, data is striped with parity
+RAId10 : is combination of raid 0 and 1 - both fast and reliabiility
+
+
+mdadm --create --verbose /dev/md0 (dev mapper) --level=mirror --raid-devices=2 /dev/sdb13 /dev/sdb14
+
+q) To check raid devices?
+cat /proc/mdstat
+result : md0 : active raid1 sdb14 sdb13
+
+mdadm --detail --scan
+
+To stop RAID array:
+mdadm --stop /dev/md0
+
+To start from conf file : mdadm --assemble --scan
+
+Managing Logical Volumes :
+=========================
+Create LVMS (PV, VG and LV)
+*********** (Logical volumes) (virtual partition)
+[_________] (Volume groups)
+---------- (physical volumes)
+
+1) pvscan ( to look for physical volumes)
+ /dev/sda2 (7.5gb /40MB free)
+ 
+ vgscan (to look for volume group)
+ 
+ lvscan ( to look for logical volumes)
+
+2) pvcreate /dev/sdb10
+   pvcreate /dev/sdb11
+   pvcreate /dev/sdb12
+   
+3)vgcreate	vg1 /dev/sdb10 /dev/sdb11 
+volume group vg1 created
+vgscan -> to show VG'sbd
+
+4) lvcreate -n lv1 -L 184m vg1
+logical volume "lv1" created
+lvscan -> to show lv's
+
+5)Create FS -> mkfs.xfs /dev/vg1/lv1 
+
+6) Mount by adding to fstab
+/dev/vg1/lv1 /lvm defaults 0 0 
+mount -a
+
+q) Extend size of logical volume
+
+vgextend vg1 /dev/sdb12  (extended volume group)
+lvextend -L +50m /dev/vg1/lv1 
+xfs_growfs /lvm
+
+
+Use LVM snapshot for backups
+=============================
+lvcreate -L 30m -s -n backup /dev/vg1/lv1 (Volume "backup" created)
+mount /dev/vg1/backup /mnt -o nouuid,ro
+
+
+
+Migrate LVM PVs from one disk to anothe
+=====================================
+pvmove /dev/sd10 /dev/sdc5
+
+q) How to reduce the size of volume group?
+vgreduce vg1 /dev/sd10
+->Removed /dev/sd10 from volume group vg1
+
+pvremove /dev/sd10
+
+Automount
+==========
+yum install autofs
+
+Note : To search for the package in online repository, you can use the command : yum list available | grep autofs
+
+/etc/autofs.master
+/etc/auto.master
+
+
+lsof (list open files)
+=============================
+
+1)which process have file open?
+lsof /var/log/ngnix.log (example)
+
+2)find all files that process has opened?
+lsof -p <PID>
+
+3) which process is logging to?
+lsof -p <pid> | grep log
+
+4)shared libraries?
+lsof -p <pid> | grep .so
+
+5)which process are using some x library?
+lsof <.so file>
+
+6) which files does user x has open?
+lsof -u <user>
+
+7) which process are listening on some port x(eg. 80)?
+lsof -i :80
+
+
+q) How to find number of cpus?
+lscpu or nproc -all
+
+
+

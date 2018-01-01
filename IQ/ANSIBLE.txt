@@ -1,0 +1,91 @@
+***********************************************************************
+Whoever update this file, add the version and description in below format
+
+Version of this file : owner : Description
+
+1.0 : Varun Korde : Included all interview questions related to Ansible and it is incomplete
+
+
+***********************************************************************
+
+
+
+
+==========================================================================================================================
+
+ANSIBLE
+
+==========================================================================================================================
+
+1)How to create a directory using Ansible
+ name: Creates directory
+  file: path=/src/www state=directory
+  
+2) Ansible playbook vs Roles?
+
+Role is a set of tasks and additional files to configure host to serve for a certain role.
+Roles are a way to group tasks together into one container. You could have a role for setting up MySQL, another one for setting up Postfix etc.
+Playbook is a mapping between hosts and roles.
+
+3) What are the advantages of using Ansible?
+The main three advantages of using this tool is,i.e. Ansible
+
+1. Agentless
+2. Very low overhead
+3. Good performance
+
+4) How do you access Shell Environment Variables?
+If you are just looking to access the existing variables then you can use “env” lookup plugin.
+For example:
+Accessing the value of Home environment variable on management machine:
+
+local_home:”{{lookup(‘env’,’HOME’)}}”
+
+5)How can you see all the inventory variables that are defined in the host?
+The best way to see all the inventory variables is by executing this command below:
+
+Ansible - m debug- a “var=hostvars[‘hostname’]” localhost
+
+6)Please define what is Ansible Galaxy?
+Ansible Galaxy refers to the website Galaxy where the users will be able to share all the roles to a CLI ( Command Line interface) where the installation, creation, and managing of roles happen
+
+7)What does Fact mean in Ansible?
+The term “Facts” is commonly used in Ansible environment. They are described in the playbooks areas where it displays known and discovered variables about the system.  Facts are used to implement conditionals executions and also used for getting ad-hoc information of the information.
+
+You can see all the facts via:
+
+$ ansible all- m setup
+
+8) User Vs Sudo Vs Sudo_user In Ansible Playbooks
+
+9) What's The Difference Between Defaults And Vars In An Ansible Role?
+
+10) How to load in some variables in my role depending on the value of environment.
+We use a variable called stage.
+
+- include_vars: testing_vars.yml
+  when: stage == "testing"
+- include_vars: staging_vars.yml
+  when: stage == "staging"
+- include_vars: production_vars.yml
+  when: stage == "production"
+  
+ or simplest way 
+ 
+ - include_vars: "{{ stage }}_vars.yml"
+ 
+ or
+ 
+ vars_files:
+  - vars/{{ stage }}_vars.yml
+  
+11) How to pass vars file content in Ansible roles?
+
+- hosts: localhost
+  name: Creation of Windows 8.1 VMs
+  roles:
+    - role: vms
+      vm_names: "{{ vmname81 }}"
+	  
+12) 
+

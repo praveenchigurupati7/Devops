@@ -1,0 +1,286 @@
+***********************************************************************
+Whoever update this file, add the version and description in below format
+
+Version of this file : owner : Description
+
+1.0 : Varun Korde : Included all interview questions related to Jenkins but not properly organized
+
+
+***********************************************************************
+
+
+
+
+================================================================
+
+Jenkins :
+
+================================================================
+
+1) Slave configuration ?
+>>Manage Jenkins >> Click New Node >> Select Dumb Slave >> Click Ok and proceed with confgurations >> Launch Slave agent using Launch Method.
+
+2) Jenkins Pipeline Job ?
+The Pipeline Jenkins Plugin simplifies building a continuous delivery pipeline with Jenkins by creating a script that defines the steps of your build. 
+
+Jenkinsfile (Declarative Pipeline)
+==================================
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building..'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Testing..'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying....'
+            }
+        }
+    }
+}
+
+Jenkinsfile (Scripted Pipeline)
+================================
+stage('Build') {
+    /* .. snip .. */
+}
+
+stage('Test') {
+    parallel linux: {
+        node('linux') {
+            checkout scm
+            try {
+                unstash 'app'
+                sh 'make check'
+            }
+            finally {
+                junit '**/target/*.xml'
+            }
+        }
+    },
+    windows: {
+        node('windows') {
+            /* .. snip .. */
+        }
+    }
+}
+Pipeline approach by Groovy scripts that will allow you to define your steps as functions and then reuse them in both your "Build job" and "Deploy job".
+
+example :
+* functions.groovy
+def build() {
+  // Build code here...
+}
+
+def test() {
+  // Test code here...
+}
+
+*build-job.groovy
+
+node {
+   def functions = load 'functions.groovy'
+
+   stage('Build') {
+       functions.build()
+   }
+   stage('Test') {
+       functions.test()
+   }
+   stage('Sonar Analysis') {
+       // Sonar analysis code...
+   }
+}
+deploy-job.groovy
+
+node {
+   def functions = load 'functions.groovy'
+
+   stage('Build') {
+       functions.build()
+   }
+   stage('Test') {
+       functions.test()
+   }
+   stage('Deploy') {
+       // Deploy code...
+   }
+}
+
+Stages are the logical segmentation of a pipeline. Separating work into stages allows separating your pipeline into distinct segments of work.
+>> Any material work within a node -
+Any material work, like cloning code from a Git server or compiling a Java application, should leverage Jenkins distributed builds capability and run an agent node.
+stage 'build'
+node{
+    checkout scm
+    sh 'mvn clean install'
+}
+>> Work You Can Within a Parallel Step
+parallel 'shifting':{
+    //everything
+}, 'left':{
+    //I can
+}
+
+*) How to use one workspace for all pipeline jobs?
+ws("/home/jenkins/workspace/pipeline") {
+    // your code goes here
+}
+
+*) Pipeline pass parameters to downstream jobs
+build job: 'your-job-name', 
+    parameters: [
+        string(name: 'passed_build_number_param', value: String.valueOf(BUILD_NUMBER)),
+        string(name: 'complex_param', value: 'prefix-' + String.valueOf(BUILD_NUMBER))
+    ]
+
+*) Build 2 Jobs Concurrently With Default Jenkins Pipeline
+stage('Build') {
+    parallel 32: {
+        ...
+    },
+    64: {
+        ...
+    }
+}
+
+3) Copying Artifacts Between Builds in a Jenkins Workflow?
+We can use copy-artifacts plugin >>
+select "copy artifacts from another project option" >> select project name >> whch build >> aritfacts to copy
+pipeline syntax :
+def built = build('downstream');  // https://plugins.jenkins.io/pipeline-build-step
+copyArtifacts(projectName: 'downstream', selector: specific("${downstream.number}"));
+e.g.,
+node {
+   // setup env..
+   // copy the deployment unit from another Job...
+   step ([$class: 'CopyArtifact',
+          projectName: 'webapp_build',
+          filter: 'target/orders.war']);
+   // deploy 'target/orders.war' to an app host
+}
+
+4) credentials and global credentials ?
+Credentials plugin - provides a centralized way to define credentials that can be used by your Jenkins instance, plugins and build jobs.
+
+Credentials Binding plugin - allows you to configure your build jobs to inject credentials as environment variables.
+
+5) How to add user or user database?
+Select Manage Jenkins, then Configure Global Security >> Click Enable Security.  The page will expand to offer a choice of access control.>> select Jenkins’ own user database >> place a check mark next to Allow users to sign up
+*)setup NIS
+Click Enable Security. >> Select Unix user/group database# >> 
+*) For LDAP, use LDAP Plugin
+
+6)How to migrate Jenkins
+archive all the content of the JENKINS_HOME of the old jenkins instance
+extract the archive into the new JENKINS_HOME directory
+launch the new Jenkins
+do not forget to change documentation/links to your new instance of Jenkins :)
+do not forget to change the owner of the new Jenkins files : chown -R jenkins:jenkins $JENKINS_HOME
+
+
+
+7)Where does Jenkins store configuration files for the jobs it runs?
+Jenkins stores the configuration for each job within an eponymous directory in jobs/. The job configuration file is config.xml, the builds are stored in builds/, and the working directory is workspace/
+
+
+8)Jenkins Job Migration?
+$JENKINS_HOME/jobs contains all the individual job configuration and build data in a separate subdirectory for each job, e.g. for the job "myjob" you'll have $JENKINS_HOME/jobs/myjob/config.xml plus other files that store the data for individual builds.
+
+So if you want to restore the system configuration and all the jobs without the build history, you'll need to copy:
+
+$JENKINS_HOME/.xml $JENKINS_HOME/jobs/*/config.xml (using Antglob notation, ** denotes all subdirectories under $JENKINS_HOME/jobs)
+
+You'll also need $JENKINS_HOME/plugins/* if you installed any extra plugins.
+
+If you want to restore all the build history, copy $JENKINS_HOME/jobs/* instead of just the config.xml files.
+
+Or use "Job import plugin" for high avialability
+
+9)what exactly does “archive artifacts” step do in Jenkins?
+*) It copies the selected artifacts in the %JENKINS_HOME%/jobs/MY_JOB/builds/... on the master server.
+
+So if you delete your slave or if you wipe your workspace, you won't lose your artifacts.
+
+But if you delete a build or if you discard the old builds, you will remove the artifacts.
+
+10)Passing the output of a job in Jenkins to another job
+*) You can use "parameterized trigger plugin"
+
+11) What are the familiar plugins?
+ - Git
+ - Pipeline Job plugin
+ - copy artfacts plugin
+ - SSH
+
+12) how to manually install plugin?
+Download the Plugin (*.hpi File) and put it in the following directory:
+
+<jenkinsHome>/plugins/
+
+or 
+
+Inside Jenkins: Manage Jenkins > Manage Plugins > There is a tab called 'Advance configuration' and in that page there is an option to upload a plugin
+
+
+13) How to change port number of jenkins?
+You can go to /etc/default/jenkins and add --httpPort=9999 or whatever port to JENKINS_ARGS
+or
+java -jar jenkins.war --httpPort=9090
+
+14) Trigger jenkins build from command line?
+curl -X POST -u YOUR_USER:YOUR_USER_PASSWORD http://YOUR_JENKINS_URL/job/YOUR_JOB/buildWithParameters?PARAM1=value1&PARAM2=value
+
+or
+
+Download Jenkins-cli.jar, and , 
+java -jar jenkins-cli.jar -s http://localhost:8080/ build ‘my-project-build’ –username roop –password roop
+
+15) Get the configuration of the job: template
+ java -jar jenkins-cli.jar -s http://jenkins/ get-job template > template.xml
+ 
+
+Pipeline example :
+// This shows a simple example of how to archive the build output artifacts.
+node {
+    stage "Create build output"
+    
+    // Make the output directory.
+    sh "mkdir -p output"
+
+    // Write an useful file, which is needed to be archived.
+    writeFile file: "output/usefulfile.txt", text: "This file is useful, need to archive it."
+
+    // Write an useless file, which is not needed to be archived.
+    writeFile file: "output/uselessfile.md", text: "This file is useless, no need to archive it."
+
+    stage "Archive build output"
+    
+    // Archive the build output artifacts.
+    archiveArtifacts artifacts: 'output/*.txt', excludes: 'output/*.md'
+}
+
+
+
+q) How to discard old builds or how to maintain only specific number of builds?
+User Discard plugin and apply in post build action.
+
+q) Job Config history is like audit log and we can revert back to the old state using this.
+
+q) How to create environment variables which is applicable to all jobs?
+-> Define variables in 
+->Inject en variables to the build process
+
+->Concurrent build plugin?
+
+-> Build Pipeline view plugin
+->Multi slave plugin
+-> Conditional trigger plugin

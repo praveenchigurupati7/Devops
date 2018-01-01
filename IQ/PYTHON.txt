@@ -1,0 +1,418 @@
+***********************************************************************
+Whoever update this file, add the version and description in below format
+
+Version of this file : owner : Description
+
+1.0 : Varun Korde : Included all interview questions related to Python and it is incomplete
+
+
+***********************************************************************
+
+
+
+
+PYTHON INTERVIEW QUESTIONS :
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Concepts :
++++++++++
+
+1) List
+2) Dict
+3) Strings
+4) Tuples
+5) Regular expression
+6) File Handling
+7) map,zip and filter
+8) comprehension
+9) generators
+10) OOPS concepts
+11) Important modules
+12) 
+
+
+
+*************************************************************************
+
+1) How to get the type of an object without using type() function?
+A) a = 12
+with using type - type(a) ans-> <type 'int'>
+a.__class__ ans-> <type 'int'>
+lst = ['abcd' , True, 12]
+lst.__class__  ans-> <type 'list'>
+lst[1].__class__ ans-><type 'bool'>
+
+2) What is the difference between list and tuples?
+List is mutable while tuple is not 
+
+3)What is PEP8?
+PEP8 is a coding convention, a set of recommendation.
+
+4) Benifits of using python?
+simple and easy, portable, built-in data structure and its open source.
+
+5) what is pass in python?
+place holder in compound statement
+
+6) docstring in python?
+way of documenting python functions, modules and classes
+
+7) difference between xrange and range?
+Xrange uses xrange object while range returns list
+
+8) map?
+map executes function given as first argument on all the elements of iterable given as second arguement
+
+9) How do we share global variables across modules in python?
+we can create config file and store entire global variable to be shared across modules and script it.
+
+10) what are uses of lambda?
+It is used to create small anonymous function 
+
+11) How memory is managed in python?
+memory is managed by private heap space. All Python objects and data structures are located in  a prvate heap.
+python memory manager is responsible for allocating heap space to objects
+python also has inbuilt garbage collector, which will recycle unused memory and frees memory and make it available to heap
+
+12) How can we perform pattern matching?
+There are 4 different ways in 're' module to perform -
+match() - matches the pattern only to the begining of the string
+search() - scan string and looks for location of string
+findall() - finds the occurence of the match and return them as the list
+finditer() - finds all the occurence of the match and return them as iterable
+
+13) Difference between "append" and "extend" list methods in python?
+append adds its argument as a single element to the end of a list. The length of the list itself will increase by one.
+
+>>> my_list
+['foo', 'bar']
+>>> my_list.append('baz')
+>>> my_list
+['foo', 'bar', 'baz']
+
+>>> another_list = [1, 2, 3]
+>>> my_list.append(another_list)
+>>> my_list
+['foo', 'bar', 'baz', [1, 2, 3]]
+
+extend iterates over its argument adding each element to the list, extending the list. 
+
+>>> my_list
+['foo', 'bar']
+>>> another_list = [1, 2, 3]
+>>> my_list.extend(another_list)
+>>> my_list
+['foo', 'bar', 1, 2, 3]
+
+14) What is the difference between pop, del and remove on the list?
+or what are difference way to remove an item from list?
+ans)
+pop returns the removed element of the list:
+
+>>> x = [1, 2, 3] 
+>>> x.pop(2) 
+3 
+>>> x 
+[1, 2]
+
+del is used to remove an element by index:
+
+>>> x = [1, 2, 3, 4]
+>>> del x[3]
+>>> x
+[1, 2, 3]
+
+remove is used to remove the first matching value in the list:
+
+>>> x = [1, 0, 0, 0, 3, 4, 5]
+>>> x.remove(4)
+>>> x
+[1, 0, 0, 0, 3, 5]
+
+
+15) difference between list.sort() and sorted(list)?
+ .sort() sorts the list and sorted() returns a sorted list.
+ The function sorted() must be a free function because it is designed to sort not just lists but also other kinds of iterables
+ On the other hand, list.sort() is an algorithm specialized for the list type, so it should be a method of list
+ `sort` is a method on list objects. It changes the list itself. Its name doesn't describe a return value
+ `sorted` is a function that takes a list argument and returns another list. Its name describes what is being returned: a sorted version of the list.
+ 
+16) what is __init__.py is used for?
+The __init__.py file makes Python treat directories containing it as modules.
+
+Furthermore, this is the first file to be loaded in a module, so you can use it to execute code that you want to run each time a module is loaded, or specify the submodules to be exported.
+
+
+17) How do I check whether a file exists using Python?
+import os.path
+os.path.isfile(fname) 
+
+In Python3.4 -
+from pathlib import Path
+
+my_file = Path("/path/to/file")
+if my_file.is_file():
+    # file exists
+To check a directory, do:
+
+if my_file.is_dir():
+    # directory exists
+	
+
+18) List files in a directory?
+os.listdir() will get you everything that's in a directory - files and directories.
+
+If you want just files, you could either filter this down using os.path:
+
+from os import listdir
+from os.path import isfile, join
+onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+
+I prefer using the glob module, as it does pattern matching and expansion.
+
+import glob
+print(glob.glob("/home/adam/*.txt"))
+Will return a list with the queried files:
+
+['/home/adam/file1.txt', '/home/adam/file2.txt', .... ]
+
+
+19) How do you call external command in python?
+from subprocess import call
+call(["ls", "-l"])
+
+The advantage of subprocess vs system is that it is more flexible (you can get the stdout, stderr, the "real" status code, better error handling, etc...).
+
+The official docs recommend the subprocess module over the alternative os.system():
+
+import subprocess
+
+p = subprocess.Popen('ls', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+for line in p.stdout.readlines():
+    print line,
+	
+difference between popen and call in subprocess is :
+Popen doesn't block, allowing you to interact with the process while it's running, or continue with other things in your Python program. The call to Popen returns a Popen object.
+
+call does block. While it supports all the same arguments as the Popen constructor, so you can still set the process' output, environmental variables, etc., your script waits for the program to complete, 
+
+subprocess
+
+Subprocess allows you to call external commands and connect them to their input/output/error pipes (stdin, stdout, and stderr). Subprocess is the default choice for running commands, but sometimes other modules are better.
+
+subprocess.run(["ls", "-l"]) # Run command
+subprocess.run(["ls", "-l"], stdout=subprocess.PIPE) # This will run the command and return any output
+subprocess.run(shlex.split("ls -l")) # You can also use the shlex library to split the command
+os
+
+os is used for "operating system dependent functionality". It can also be used to call external commands with os.system and os.popen (Note: There is also a subprocess.popen). os will always run the shell and is a simple alternative for people who don't need to, or don't know how to use subprocess.run.
+
+os.system("ls -l") # run command
+os.popen("ls -l").read() # This will run the command and return any output
+
+
+
+20) You can call items on the dictionary to get a list of pairs of (key, value).
+
+21) reverse the order of dict usng dict comprehension?
+ex: {a:3, b:7} output : {3:a, 7:b}
+ans)  {value: key for (key, value) in my_dict.items()}
+
+22) How to remove a key from python dict?
+my_dict.pop('key', None)
+
+23) What does yeild keyword does? what is the difference between yeild and return keyword?
+Yield is a keyword that is used like return, except the function will return a generator.
+Generators are iterators, but you can only iterate over them once. It’s because they do not store all the values in memory, they generate the values on the fly:
+The yield statement suspends function’s execution and sends a value back to caller, but retains enough state to enable function to resume where it is left off. When resumed, the function continues execution immediately after the last yield run. This allows its code to produce a series of values over time, rather them computing them at once and sending them back like a list.
+# A Simple Python program to demonstrate working
+# of yield
+ 
+# A generator function that yields 1 for first time,
+# 2 second time and 3 third time
+def simpleGeneratorFun():
+    yield 1
+    yield 2
+    yield 3
+ 
+# Driver code to check above generator function
+for value in simpleGeneratorFun(): 
+    print(value)
+	
+The yield enables a function to comeback where it left off when it is called again. This is the critical difference from a regular function
+A generator function is a way to create an iterator. A new generator object is created and returned each time we call a generator function.
+	
+24) What does if __name__ == "__main__": do?
+__name__ is a global variable (in Python, global actually means on the module level) that exists in all namespaces. It is typically the module's name
+
+
+
+25) How can I create a directory if it does not exist?
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
+26) Access environment variables from Python
+import os
+print os.environ['HOME']
+print os.environ.get('HOME','/home/username/')
+
+27) Interating key and values in dictonary?
+for key, value in d.items():
+
+28) How can I find all the files in a directory having the extension .txt in python?
+You can use glob:
+
+import glob, os
+os.chdir("/mydir")
+for file in glob.glob("*.txt"):
+    print(file)
+or simply os.listdir:
+
+import os
+for file in os.listdir("/mydir"):
+    if file.endswith(".txt"):
+        print(os.path.join("/mydir", file))
+or if you want to traverse directory, use os.walk:
+
+import os
+for root, dirs, files in os.walk("/mydir"):
+    for file in files:
+        if file.endswith(".txt"):
+             print(os.path.join(root, file))
+
+
+
+29) Reading entire file in python?
+with open('Path/to/file', 'r') as content_file:
+    content = content_file.read()
+
+30) How can I open multiple files using “with open” in Python?
+with open('a', 'w') as a, open('b', 'w') as b:
+    for line in a.readlines():
+	    b.writelines(line)
+
+31) map function
+map(aFunction, aSequence)
+One of the common things we do with list and other sequences is applying an operation to each item and collect the result.
+
+For example, updating all the items in a list can be done easily with a for loop:
+
+>>> items = [1, 2, 3, 4, 5]
+>>> squared = []
+>>> for x in items:
+	squared.append(x ** 2)
+
+	
+>>> squared
+[1, 4, 9, 16, 25]
+
+The map(aFunction, aSequence) function applies a passed-in function to each item in an iterable object and returns a list containing all the function call results.
+
+>>> items = [1, 2, 3, 4, 5]
+>>> 
+>>> def sqr(x): return x ** 2
+
+>>> list(map(sqr, items))
+[1, 4, 9, 16, 25]
+>>> 
+
+32) filter function?
+select certain pieces of data from collection.
+The function filter(function, list) offers an elegant way to filter out all the elements of a list, for which the function function returns True
+>>> list( filter((lambda x: x < 0), range(-5,5)))
+[-5, -4, -3, -2, -1]
+
+
+33)What is __init__.py?
+It is used to import a module in a directory, which is called package import.
+
+If we have a module, dir1/dir2/mod.py, we put __init__.py in each directories so that we can import the mod like this:
+
+import dir1.dir2.mod
+The __init__.py is usually an empty py file. The hierarchy gives us a convenient way of organizing the files in a large system.
+
+
+
+
+
+33) What are the built-in type does python provides?
+
+There are mutable and Immutable types of Pythons built in types Mutable built-in types
+
+List
+Sets
+Dictionaries
+Immutable built-in types
+
+Strings
+Tuples
+Numbers
+
+
+35) Generators?	
+Generators allow us to declare a function that behaves like an iterator, i.e. it can be used in a for loop. It's a function type generator, but there is another type of generator that may be more familiar to us - expression type generator used in list comprehension:
+
+>>> # List comprehension makes a list
+>>> [ x ** 3 for x in range(5)]
+[0, 1, 8, 27, 64]
+>>> 
+>>> # Generator expression makes an iterable
+>>> (x ** 3 for x in range(5))
+<generator object <genexpr> at 0x000000000315F678>
+With the generator expression, we can just wrap it with list() call:
+
+>>> list(x ** 3 for x in range(5))
+[0, 1, 8, 27, 64]
+
+Since every generator is an iterator, we can use next() to get the values:
+
+>>> generator = (x ** 3 for x in range(5))
+>>> generator.next()
+0
+>>> generator.next()
+1
+>>> generator.next()
+8
+>>> generator.next()
+27
+
+
+
+  
+
+36) sort method in list?
+sort(key=None, reverse=False)
+Key value takes function as input
+ex, size = lambda x: x(1) (Sorting function)
+sort(key=size, reverse=True)
+
+37) How do you sort tuple?
+use sorted method,
+sorted(iterable, Key=None, reverse=False)
+
+38) Difference between remove and discard method() 
+
+
+39) How to swap two variables in a simplest way?
+x,y = y,x
+its called tuple unpacking
+
+40) get function from dict?
+age = ages.get('Dick', 'Unknown')
+gets values of Dick key and assign it to age, if Dick key is not available assign Unknown value.
+
+
+41)why we should use enumerate or How can we print index-Id and context from list?
+
+
+42) How to loop both loops at a time?
+for x, y in zip(x_list, y_list):
+	print(x,y)
+	
+43)How do you debug python?
+A) you can start the debugging from inside the program using import pdb and set_trace()
+ from command liine -> python -m pdb <sccript>
+ 
+

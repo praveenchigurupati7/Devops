@@ -1,0 +1,183 @@
+***********************************************************************
+Whoever update this file, add the version and description in below format
+
+Version of this file : owner : Description
+
+1.0 : Varun Korde : Included all interview questions related to Tomcat but not properly organized
+
+
+***********************************************************************
+
+
+
+================================================================
+
+TOMCAT :
+
+================================================================
+1) Difference between webserver, application server and web container?
+ -> webserver serves static content
+ eg., Apache, IIS
+    No server side programming
+	
+ -> Application server can run our dynamic application which connects to the database
+    serves business logic to application programs 
+     services to application , transatcion manager , sercurity, concurrency 
+	 dynamic HTML content
+	 APP server -> webcontainer (which knows how to run lifecycle of server side java pgm like JSP, servlets) e.g Tomcat
+	            -> Application client container (which knows dependency Injection (DI), security)
+				-> EJB Container (knows how to run EJB lifecycle)
+		(Logical division)
+	Apache tomcat is a webcontainer not a application server
+	e.g, JBOSS, weblogic and websphere
+	
+2) Tomcat?
+HTTP server and servlet container
+
+3) How to deploy webapplication on Tomcat?
+-> first you need to create war file
+   jar -cvf <dirName>.war .
+---> Go to Manager App
+      here upload your file
+	  
+ Manually if you want to upload, copy war file in webapps folder
+ 
+4) Folder structure for war to be uploaded in Tomcat?
+webapp 
+   ->web-inf (deployment sctipt directory)
+      -> classes
+	  -> lib
+	  -> web.xml (deployment descriptor file)
+	  
+HTML/JSP file
+
+content of web.xml -
+<web-app>
+	<servlet>
+		<servlet-name>HelloWorld</servlet-name>
+		<servlet-class>org.ca.example.HelloWorld</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>HelloWorld</servlet-name>
+		<url-pattern>/HelloWorld</url-pattern>
+	</servlet-mapping>
+</web-app>
+
+5) What are the connectors used in Tomcat?
+*AJP Connector
+-> If you want to integrate Tomcat with the apache 
+AJP is a faster way for a web server to communicate with an application.
+AJP is particularly used for "Load Balancing." This is where one server distributes incoming traffic among several application servers, sharing the load equally.
+*HTTP Connector
+
+6) How do you create multiple virtual hosts?
+Update tomcat_dir/conf/server.xml with multiple hosts entries -
+<Host name="www.domain1.com" appBase="/opt/tomcat/www.domain1.com" unpackWARs="true" autoDeploy="true" xmlValidation="false" xmlNamespaceAware="false"/>
+<Host name=”www.domain2.com” appBase=”/opt/tomcat/www.domain2.com” unpackWARs=”true” autoDeploy=”true” xmlValidation=”false” xmlNamespaceAware=”false”/>
+
+7) What are the tomcat default ports and how to reconfigure the port?
+
+default port :
+8080, HTTP
+8443, HTTPS
+8005, shutdown service 
+8009, AJP connector, tomcat's half of mod_proxy_ajp, (not recommended for performance)
+use netstat -nlp to check for other processes using these ports
+
+Reconfiguring port :
+Goto <tomcat>/conf folder
+Edit server.xml
+Search "Connector port"
+Replace "8080" by your port number
+Restart tomcat server.
+
+8) How to set the Debug and Error mode in tomcat logs?
+if you are using the Tomcat default logging (java.util.Logging), you need to configure the Logging level in ${catalina.base}/conf/logging.properties.
+you should specify org.apache.catalina.level=FINEST
+A handler's log level threshold is INFO by default and can be set using SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST or ALL.
+
+9)how to stop and start the tomcat service
+tomcat/bin/startup.sh to start tomcat, invokes catalina.sh
+tomcat/bin/shutdown.sh to stop tomcat, invokes catalina.sh
+
+10)log path for tomcat?
+Logs In tomcat/logs
+typically date-stamped, rolled over each time restarted
+STDOUT (main tomcat server stuff) in tomcat/logs/catalina.out
+rollover STDOUT logs in tomcat/logs/catalina._yyyy-mm-dd_.log
+individual webapps in tomcat/logs/_webappname_._yyyy-mm-dd_.log
+
+11)How to troubleshoot perfomace issue of the Java application installed on tomcat?
+*) Start the JVM with a higher heap memory maximum using the -Xmx switch. The higher you make this, the more memory is available for Tomcat to use. This means that the JVM won't need to invoke the garbage collector as often, which means that the server can focus a higher percent of its CPU time to serving web requests. That, in turn, means that requests can be completed faster.
+*) Start the JVM with its initial heap memory size (the -Xms switch) set the same value as its maximum memory size. This means the JVM never needs to resize and reallocate the heap memory while Tomcat is trying to serve requests.
+*) Tune the Connector (web server) thread pool settings to more closely match the web request load you have. This is difficult to do, but is very important to get right for best performance. The important Connector attribute for this is maxThreads. Setting this too low means that you may not have enough threads to handle all of the requests, in which case requests have to sit idle for some time without being handled until another request thread is freed up.
+
+<connector>
+  port="8080"
+  maxThreads="800"
+  minSpareThreads="80"
+  maxSpareThreads="160"
+  compression="on"
+  compressableMimeType="text/html,text/xml,text/plain">
+</connector>
+
+Other important factors in performance tuning include:
+
+Database performance: Many webapps use a relational database nowadays. The database connection pool settings are very important in that case. Mainly, the maxActive, maxIdle, and maxWait attributes of the Resource element where you define your database connection pool. Also, what about performance testing your database? Tomcat's performance may be significantly slowed waiting on database queries to complete.
+
+<Context>
+<Resource name="jdbc/productdb" auth="Container" type="javax.sql.DataSource"
+               maxTotal="200" maxIdle="30" maxWaitMillis="10000" logAbandoned="true"
+               username="xxxx" password="xxxx" driverClassName="com.mysql.jdbc.Driver"
+               url="jdbc:mysql://localhost:3306/products"/>
+</Context>
+
+ JVM Settings
+Since we have increased the maximum number of pooled connections and AJP connector thread thresholds above, we should increase the heap size appropriately. We have set the minimum and maximum heap size to 2GB respectively as below:
+
+export CATALINA_OPTS="-Xms2048m -Xmx2048m"
+
+
+12)APACHE/TOMCAT WITH FAILOVER AND LOAD BALANCING ?
+	1. Install Apache.
+	2. Copy the mod_jk so file to your apache/modules directory.
+		Add the following to your apache/conf/httpd.conf
+		LoadModule jk_module modules/mod_jk-1.2.28-httpd-2.2.3.so
+		 
+		JkWorkersFile          conf/workers.properties
+		JkLogFile              logs/jk.log
+		JkLogLevel             debug
+		 
+		JkMount                /*            router
+		JkMount                /jk_status    status
+
+		Create a workers.properties file in your apache/conf directory. The file should contain the following:
+				worker.list=router,status
+				 
+				worker.worker1.port=8109
+				worker.worker1.host=localhost
+				worker.worker1.type=ajp13
+				worker.worker1.lbfactor=1
+				worker.worker1.local_worker=1
+				worker.worker1.sticky_session=0
+				 
+				worker.worker2.port=8209
+				worker.worker2.host=localhost
+				worker.worker2.type=ajp13
+				worker.worker2.lbfactor=1
+				worker.worker2.local_worker=0
+				worker.worker2.sticky_session=0
+				 
+				worker.worker3.port=8309
+				worker.worker3.host=localhost
+				worker.worker3.type=ajp13
+				worker.worker3.lbfactor=1
+				worker.worker3.local_worker=0
+				worker.worker3.sticky_session=0
+				 
+				worker.router.type=lb
+				worker.router.balanced_workers=worker1,worker2,worker3
+				worker.router.local_worker_only=1
+ 
+				worker.status.type=status
+		Extract the Tomcat installation ZIP archive to three different directories, as we’re going to load balance three instances of Tomcat. You’ll be replacing the server.xml file in each of the Tomcat conf/ directories with the following:

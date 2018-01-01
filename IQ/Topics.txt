@@ -1,0 +1,18 @@
+1) Sys Admin (Linux) (Done)
+2) Tomcat and Apache (Done)
+3) Jboss, Websphere or weblogic
+4) Oracle/MySQL Database
+5) Jenkins (Done)
+6) Puppet/Chef
+7) Ansible
+8) Docker (Done)
+9) Log Monitoring (Splunk, ELK)
+10) Server Monitoring (Nagios)
+11) Git/version control (Done)
+12) Build and deploy Trouble shooting
+13) Maven and ANT
+14) python/shell/perl
+15) LoadBalancer (Netscalar, HAProxy)
+16) Basic Networking concepts 
+
+==============================================

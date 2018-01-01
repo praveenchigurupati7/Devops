@@ -1,0 +1,113 @@
+***********************************************************************
+Whoever update this file, add the version and description in below format
+
+Version of this file : owner : Description
+
+1.0 : Varun Korde : Included all interview questions related to Git but not properly organized
+
+
+***********************************************************************
+
+
+
+
+=============================================================================================
+Git
+=============================================================================================
+HEAD is a symbolic reference to the currently active branch
+1) How do you revert a commit that has already been pushed and made public?
+git revert <bad commit>
+
+2) How do you find list of files that has changed in particular commit ?
+git diff-tree -r {Hash} (-r list individual files also rather than displaying parent folder)
+git diff-tree -no-commit-id -name-only -r {hash}
+
+3) How do you squash last N commits in to single commit?
+git reset -soft HEAD~N 
+git commit 
+
+4) git reset soft vs mixed vs hard?
+soft - undo the last commit, but the file changes will stay in your working tree. Also the changes will stay on your index.
+mixed - undo last commit, will still keep the changes in your working tree but not on the index
+hard - will lose the changes introduced in the last commit. The changes won't stay in your working tree 
+
+5) git rebase?
+moves the entire feature branch to begin on the tip of the master branch, effectively incorporating all of the new commits in master. But, instead of using a merge commit, rebasing re-writes the project history by creating brand new commits for each commit in the original branch.
+ -  it eliminates the unnecessary merge commits required by git merge
+ - perfectly linear project history
+
+The major benefit of rebasing is that you get a much cleaner project history.
+
+6) git rebase -i? 
+Interactive rebasing gives you the opportunity to alter commits as they are moved to the new branch
+
+7) How to squash N commits from feature branch to master branch?
+git merge -squash
+
+8) git reflog?
+Reflogs track when Git refs were updated in the local repository. In addition to branch tip reflogs, a special reflog is maintained for the Git stash. Reflogs are stored in directories under the local repository's .git directory. git reflog directories can be found at .git/logs/refs/heads/., .git/logs/HEAD, and also .git/logs/refs/stash if the git stash has been used on the repo.
+The reflog command will give you a good history of what's been happening on the head of your branches
+"reflogs", record when the tips of branches and other references were updated in the local repository.
+* - Git keeps track of updates to the tip of branches using a mechanism called reference logs,or reflogs like - checkout, merge, reset
+
+9) recovering lost commits?
+
+https://www.atlassian.com/git/tutorials/rewriting-history/git-reflog
+
+
+10) How to restore a delete branch?
+git reflog
+git checkout -b <branch> <sha>
+
+11) How to recover from git reset --hard?
+$ git reflog show
+93567ad HEAD@{0}: reset: moving to HEAD@{6}    
+203e84e HEAD@{1}: reset: moving to HEAD@{1}    
+9937a76 HEAD@{2}: reset: moving to HEAD@{2}
+203e84e HEAD@{3}: checkout: moving from master to master
+203e84e HEAD@{4}: reset: moving to HEAD~1
+9937a76 HEAD@{5}: reset: moving to HEAD~1
+d5bb59f HEAD@{6}: reset: moving to HEAD~1
+9300f9d HEAD@{7}: commit: fix-bug
+
+# said the commit to be recovered back is on 9300f9d (with commit message fix-bug)
+$ git reset HEAD@{7}
+
+
+12) git diff?
+git diff --cached - This is the difference between what is in the index and the last commit.
+git diff -  This shows the difference in between the index and the working tree.
+git diff HEAD - This shows the difference between the files in the working tree and the last commit. 
+
+13) git stash?
+git stash temporarily shelves (or stashes) changes you've made to your working copy so you can work on something else, and then come back and re-apply them later on.
+ reapplying your stashed changes - git stash pop
+ Alternatively, you can reapply the changes to your working copy and keep them in your stash with git stash apply:
+ Managing multiple stashes : git stash list
+ git stash pop stash@{2}
+ Creating a branch from your stash : git stash branch add-stylesheet stash@{1}
+ 
+14) Changing the last commit?How can you fix a broken commit?
+git commit --amend
+
+15) How will you know in GIT if a branch has been already merged into master?
+Git branch—merged lists the branches that have been merged into the current branch
+
+Git branch—-no merged lists the branches that have not been merged
+
+16) git bisect?
+Git provides a rather efficient mechanism to find bad commits. 
+
+17) How do you copy commit made in one branch to another?
+git cherry-pick {hash}
+
+18) diff between git pull and git fetch?
+git fetch only downloads new data from a remote repository, but it doesn’t integrate
+git pull downloads as well as merges the data 
+
+19) Git lfs?
+large file storage
+
+20) How to delete branch and tag in git?
+git branch -d <delete>
+git push origin :banchName

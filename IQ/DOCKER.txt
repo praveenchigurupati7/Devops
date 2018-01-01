@@ -1,0 +1,184 @@
+***********************************************************************
+Whoever update this file, add the version and description in below format
+
+Version of this file : owner : Description
+
+1.0 : Varun Korde : Included all interview questions related to Docker but not properly organized
+
+
+***********************************************************************
+
+
+
+
+=================================================================================================
+
+DOCKER :
+
+=================================================================================================
+
+1) How to create docker container?
+docker run -t -i command name
+
+2) check list of running container?
+docker ps -a
+
+3) stop and restart container?
+docker stop <containerID>
+docker start <containerID>
+
+4) How to remove docker old container?
+To remove ALL STOPPED CONTAINERS
+
+docker rm $(docker ps -a -q)
+
+To remove ALL CONTAINERS (STOPPED AND NON STOPPED)
+
+docker rm  -f $(docker ps -a -q)
+
+5) How to remove docker old images?
+docker rmi $(docker images -q -f "dangling=true")
+
+*docker system prune will delete ALL unused dat
+
+6) Copying files from host to Docker container
+docker cp foo.txt mycontainer:/foo.txt
+docker cp mycontainer:/foo.txt foo.txt
+
+7) How to get a Docker container's IP address from the host?
+docker inspect <container ID>
+
+8) Docker: Expose a range of ports
+docker run -p 8000-9000:8000-9000
+or
+docker run -p 192.168.0.10:8000-9000:8000-9000
+
+9)What is the difference between CMD and ENTRYPOINT in a Dockerfile?
+The ENTRYPOINT specifies a command that will always be executed when the container starts
+CMD sets default command and/or parameters, which can be overwritten from command line when docker container runs.
+ENTRYPOINT command and parameters will not be overwritten from command line. Instead, all command line arguments will be added after ENTRYPOINT parameters.
+
+10)What is the difference between the `COPY` and `ADD` commands in a Dockerfile?
+COPY resources/jdk-7u79-linux-x64.tar.gz /tmp/
+RUN tar -zxvf /tmp/jdk-7u79-linux-x64.tar.gz -C /usr/local
+RUN rm /tmp/jdk-7u79-linux-x64.tar.gz
+
+ADD has all the capabilities of COPY and has the following additional features:
+Allows tar file auto-extraction in the image, for example,
+ADD app.tar.gz /opt/var/myapp.	
+
+11) How to mount the current working directory onto Docker container?
+Mouting a volume in docker (-v) allows a container to share directories/volumes with the host. 
+-v /path/on/host:/path/in/container
+Mounting host volumes during build is not possible
+
+12)How to copy docker images from one host to another without via repository?
+You will need to save the docker image as a tar file:
+
+docker save -o <save image to path> <image name>
+
+Then copy your image to a new system with regular file transfer tools such as cp or scp. After that you will have to load the image into docker:
+
+docker load -i <path to image tar file>
+
+13) What is the difference between save and export in Docker?
+Save command saves whole image with history and metadata but export command exports only files structure (without history and metadata). So the exported tar file will be smaller then the saved one.
+When you use exported file system for creating a new image then this new image will not contains any USER, EXPOSE, RUN etc. commands from your Dockerfile. Only file structure will be transferred. 
+
+Docker save Produces a tar file repo which contains all parent layers, and all tags + versions, or specified repo:tag, for each argument provided from image.
+
+Docker export Produces specified file(can be tar or tgz) with flat contents without contents of specified volumes from Container.
+
+docker save need to use on docker image while docker export need to use on container(just like running image)
+
+
+14) Difference between “expose” and “publish” in docker
+Basically, you have three options:
+
+ - Neither specify EXPOSE nor -p.
+ - Only specify EXPOSE.
+ - Specify EXPOSE and -p.
+ 
+ If you EXPOSE a port, the service in the container is not accessible from outside Docker, but from inside other Docker containers. So this is good for inter-container communication.
+ 
+ If you EXPOSE and -p a port, the service in the container is accessible from anywhere, even outside Docker.
+ 
+ If you do -p, but do not EXPOSE, Docker does an implicit EXPOSE. This is because if a port is open to the public, it is automatically also open to other Docker containers. Hence -p includes EXPOSE.
+ 
+15) How to set environment variables?
+ENV abc=hello
+
+16) docker exec?
+
+17) How to pass variables during build time?
+ARG <name>[=<default value>] in docker file
+ARG user1 in docker file
+--build-arg <varname>=<value> during build
+
+18) What is the difference between RUN and ENTRYPOINT?
+RUN and ENTRYPOINT are two different way to execute a script.
+
+RUN means it creates an intermediate container, runs the script and freeze the new state of that container in a new intermediate image. The script won't be run after that: your final image is supposed to reflect the result of that script.
+
+ENTRYPOINT means your image (which has not executed the script yet) will create a container, and runs that script.
+
+In both cases, the script needs to be added, and a RUN chmod +x /bootstarp.sh is a good idea.
+
+19) How to define a variable in a Dockerfile?
+use both ARG (docker build --build-arg var=value) and ENV.
+Using ARG alone means your variable is visible at build time, not at runtime.
+
+My Dockerfile usually has:
+ARG var
+ENV var=${var}
+
+sample docker file
+===================
+
+FROM ubuntu
+***********
+defines the base image to use to start the build process
+
+
+MAINTAINER Example McAuthor
+*******************************
+ declares the author, 
+
+ENV SERVER_WORKS 4
+*****************
+ENV command is used to set the environment variables (one or more). These variables consist of “key = value” pairs which can be accessed within the container by scripts and applications alike.
+
+ADD /my_app_folder /my_app_folder
+********************************* 
+copies the files from the source on the host into the container's own filesystem at the set destination
+If, however, the source is a URL (e.g. http://github.com/user/file/), then the contents of the URL are downloaded and placed at the destination.
+
+
+RUN apt-get update
+*******************
+It takes a command as its argument and runs it to form the image
+
+USER 751
+**********
+USER directive is used to set the UID (or username) which is to run the container based on the image being built.
+
+VOLUME ["/my_files"]
+**********************
+VOLUME command is used to enable access from your container to a directory on the host machine 
+
+
+WORKDIR ~/
+************
+WORKDIR directive is used to set where the command defined with CMD is to be executed
+
+EXPOSE 27017
+*************
+ EXPOSE command is used to associate a specified port to enable networking between the running process inside the container and the outside world 
+
+CMD ["--port 27017"]
+**********************
+command CMD, similarly to RUN, can be used for executing a specific command. unlike RUN it is not executed during build, but when a container is instantiated using the image being built. 
+
+ENTRYPOINT usr/bin/mongod
+**************************
+default application that is used every time a container is created using the image.
