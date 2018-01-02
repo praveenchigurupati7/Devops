@@ -23,8 +23,12 @@ git diff-tree -r {Hash} (-r list individual files also rather than displaying pa
 git diff-tree -no-commit-id -name-only -r {hash}
 
 3) How do you squash last N commits in to single commit?
+Type1:
 git reset -soft HEAD~N 
-git commit 
+git commit
+Type2:
+git rebase -i HEAD~3
+which will open a editor, from which pick the commit you want to retain and squash the remaining commits.
 
 4) git reset soft vs mixed vs hard?
 soft - undo the last commit, but the file changes will stay in your working tree. Also the changes will stay on your index.
@@ -91,9 +95,9 @@ git stash temporarily shelves (or stashes) changes you've made to your working c
 git commit --amend
 
 15) How will you know in GIT if a branch has been already merged into master?
-Git branch—merged lists the branches that have been merged into the current branch
+Git branchâ€”merged lists the branches that have been merged into the current branch
 
-Git branch—-no merged lists the branches that have not been merged
+Git branchâ€”-no merged lists the branches that have not been merged
 
 16) git bisect?
 Git provides a rather efficient mechanism to find bad commits. 
@@ -102,7 +106,7 @@ Git provides a rather efficient mechanism to find bad commits.
 git cherry-pick {hash}
 
 18) diff between git pull and git fetch?
-git fetch only downloads new data from a remote repository, but it doesn’t integrate
+git fetch only downloads new data from a remote repository, but it doesnâ€™t integrate
 git pull downloads as well as merges the data 
 
 19) Git lfs?
