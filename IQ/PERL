@@ -1,4 +1,4 @@
-Perl script for a password validation?
+1) Perl script for a password validation?
 #!/usr/bin/perl
 
 use Data::Dumper;
