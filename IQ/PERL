@@ -1,0 +1,42 @@
+Perl script for a password validation?
+#!/usr/bin/perl
+
+use Data::Dumper;
+use List::Util 'first';
+
+%loop = ("praveen" => "rocket", "guest" => "test");
+
+@test = keys(%loop);
+
+print "What is your name:";
+$var1 = <STDIN>;
+chomp($var1);
+
+if( grep{$_ eq $var1} @test){
+
+        print "What is your Password:";
+        $var2 = <STDIN>;
+        $size = length($var2);
+
+        if($size <= 6){
+
+                print "\n Password should be more than 6 characters \n";
+                exit;
+        }else{
+                if($loop{$var1} eq $var2){
+
+                                print "\n your password is successfully verfied \n";
+                                exit;
+                        }else{
+
+                                                        print "please provide a valid password \n";
+                                                        exit;
+                                                }
+
+        }
+
+}else{
+
+        print "\n Not a vaild user \n";
+        exit;
+}
