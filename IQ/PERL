@@ -40,3 +40,30 @@ if( grep{$_ eq $var1} @test){
         print "\n Not a vaild user \n";
         exit;
 }
+
+
+
+2) how to know the count of character iterated in a string?
+
+#!/usr/bin/perl
+
+use Data::Dumper;
+print "Enter any string:";
+$name = <STDIN>;
+chomp($name);
+
+@test = split(//,$name);
+
+#print Dumper(\@test);
+
+my %hash;
+for my $key (@test){
+
+
+        $hash{$key}++;
+}
+
+for my $key (keys %hash){
+
+        print "$key:", $hash{$key}, "\n";
+
