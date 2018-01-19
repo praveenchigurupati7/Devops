@@ -284,3 +284,26 @@ q) How to create environment variables which is applicable to all jobs?
 -> Build Pipeline view plugin
 ->Multi slave plugin
 -> Conditional trigger plugin
+
+
+q) What plugins have you used in your project?
+-> Environment injector plugin
+-> Slave utilization plugin
+-> Rebuilder
+-> Discard old build plugin
+-> Build pipeline plugin
+-> Jenkins Job restrictions plugin
+-> TImestamper
+-> External resource dispatcher plugin
+-> Jenkins throttle Concurrent builds plugin
+-> Job and node ownership plugin
+-> Credentials binding plugin
+-> Reactor plugin
+-> Shared workspace plugin
+-> Jenkins user build vars plugin
+-> Email extension plugin
+-> Naginator
+-> Conditional build step
+-> Metadata plugin
+-> Jenkins parameterized trigger plugin
+-> 

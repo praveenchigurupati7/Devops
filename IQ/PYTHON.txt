@@ -407,7 +407,7 @@ gets values of Dick key and assign it to age, if Dick key is not available assig
 41)why we should use enumerate or How can we print index-Id and context from list?
 
 
-42) How to loop both loops at a time?
+42) How to iterate both loops at a time?
 for x, y in zip(x_list, y_list):
 	print(x,y)
 	

@@ -1,0 +1,250 @@
+MAVEN :
+==========================
+
+1) What does secutiy_settings.xml contains?
+This file either contains encrypted master password, used to encrypt other passwords.
+mvn --encrypt-master-password <password>
+<settingsSecurity>
+  <master>{jSMOWnoPFgsHVpMvz5VrIt5kRbzGpI8u+9EF1iFQyJQ=}</master>
+</settingsSecurity>
+
+When you run a Maven build that needs to interact with the repository manager, Maven will retrieve the Master password from the ~/.m2/settings-security.xml file and use this master password to decrypt the password stored in your ~/.m2/settings.xml file. Maven will then send the decrypted password to the server.
+
+
+2) settings.xml?
+- localRepository : The local repository. 
+- interactiveMode : Whether Maven should attempt to interact with the user for input.
+- usePluginRegistry : Whether Maven should use the plugin-registry.xml file to manage plugin versions.
+- offline : Indicate whether maven should operate in offline mode full-time.
+- proxies/proxy* : Configuration for different proxy profiles. 
+- servers/server* :  Configuration of server-specific settings, mainly authentication method.
+- mirrors/mirror* : Configuration of download mirrors for repositories.
+- profiles/profile* : Configuration of build profiles for adjusting the build according to environmental parameters.
+- activeProfiles/activeProfile* : List of manually-activated build profiles, specified in the order in which they should be applied.
+- pluginGroups/pluginGroup* : List of groupIds to search for a plugin when that plugin groupId is not explicitly provided.
+
+3) default life cycle?
+There are 21 phases in default life cycle, below are important :
+- validate 
+- compile
+- test
+- package
+- verify
+- install
+- deploy
+
+So to go through the above phases, we just have to call one command:
+
+mvn <phase> { Ex: mvn install }
+
+ mvn [plugin-name]:[goal-name]
+ mvn compiler:compile
+ 
+ Goals provided by plugins can be associated with different phases of the lifecycle. For example, by default, the goal compiler:compile is associated with the compile phase, while the goal surefire:test is associated with the test phase
+ 
+ phase is made up of plugin goals.
+ 
+ 
+ Maven defines 4 "steps" of a Build Process:
+
+Life Cycle:     3 Life Cycles (aka Build Lifecycles) - Default, Clean, Site. 
+Build Phase:  Each Life Cycle is made up of Phases - e.g. For default lifecycle: compile, test, package, install, etc
+Plugin:           Artifact that provide one or more goals. Based on packaging(jar,war,etc), a plugin:goal is bind to a phase. Details
+Goals:           The task (action) that executes. A plugin can have one or more goals. When configuring a plugin in a POM, goal needs to be specified. Additionally, in case a plugin definition does not have a default build phase, the phase can be specified/bind with the plugin goal.
+
+
+4) How to inherit dependency from a parent pom to a child pom?
+->Give the dependency in the parent pom under the <dependencyManagement /> node
+and in each child that requires it, add the dependency in <dependenciies /> node without giving the version.
+
+The dependencyManagement element is equivalent to an environment variable which allows you to declare a dependency anywhere below a project without specifying a version number.
+
+5) What is the difference between dependencies and dependencyManagement?
+In the parent POM, the main difference between the <dependencies> and <dependencyManagement> is this:
+
+Artifacts specified in the <dependencies> section will ALWAYS be included as a dependency of the child module(s).
+
+Artifacts specified in the <dependencyManagement> section, will only be included in the child module if they were also specified in the <dependencies> section of the child module itself. 
+
+
+6)How do I add local jar files (not yet part of the Maven repository) directly in my project's library sources?
+<dependency>
+    <groupId>sample</groupId>
+    <artifactId>com.sample</artifactId>
+    <version>1.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/src/main/resources/yourJar.jar</systemPath>
+</dependency>
+
+or
+
+mvn install:install-file
+   -Dfile=<path-to-file>
+   -DgroupId=<group-id>
+   -DartifactId=<artifact-id>
+   -Dversion=<version>
+   -Dpackaging=<packaging>
+   -DgeneratePom=true
+   
+7)I need to deploy a custom jar to Artifactory along with the jar generated from my Java project. 
+How do you do that?
+
+Using deploy plugin and from command line :
+mvn deploy:deploy-file -DgroupId=<group-id> \
+  -DartifactId=<artifact-id> \
+  -Dversion=<version> \
+  -Dpackaging=<type-of-packaging> \
+  -Dfile=<path-to-file> \
+  -Durl=<url-of-the-repository-to-deploy>
+
+from pom.xml, use maven-deploy-plugin:deploy-file goal bound to the deploy phase,
+<plugin>
+    <artifactId>maven-deploy-plugin</artifactId>
+    <version>2.8.2</version>
+    <executions>
+        <execution>
+            <id>deploy-file</id>
+            <phase>deploy</phase>
+            <goals>
+                <goal>deploy-file</goal>
+            </goals>
+            <configuration>
+                <file><!-- path-to-file --></file>
+                <url><!-- url-of-the-repository-to-deploy --></url>
+                <groupId><!-- group-id --></groupId>
+                <artifactId><!-- artifact-id --></artifactId>
+                <version><!-- version --></version>
+                <packaging><!-- type-of-packaging --></packaging>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+
+8) How to override default settings in maven or I want to use a different source directory for a specific maven profile?
+a) you can change only few <build> parameters in the profile and <sourceDirectory> is not one of them.
+
+I'd configure the main <build> to take sources from path defined by some property (eg. src.dir), set this property to src/main/java and override it in the custom profile:
+
+<project>
+    ...
+    <properties>
+        <src.dir>src/main/java</src.dir>
+    </properties>
+    <build>
+        <sourceDirectory>${src.dir}</sourceDirectory>
+        ...
+    </build>
+
+We can override the default settings of the project by mentioning under build tag
+ <build>
+    <sourceDirectory/>
+    <scriptSourceDirectory/>
+    <testSourceDirectory/>
+    <outputDirectory/>
+    <testOutputDirectory/>	
+	<directory/>
+    <finalName/>
+    <filters/>
+	
+9) What is maven profile?
+Maven Profile is an alternative set of configurations which set or override default values. Maven Profiles allow to customize a build for different environments
+
+Example :
+<profiles> 
+   <profile>
+     <id>production</id>
+         <build>
+            <plugins>
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <configuration>
+                      <debug>false</debug> 
+                      <optimize>true</optimize>
+                  </configuration>
+                </plugin>
+            </plugins>
+         </build>
+   </profile>
+ </profiles>
+ 
+ 10) pom.xml consists of 4 parts :
+   -> Project information 
+        -group ID [company name, e.g, com.ca.xxx]
+		- artifactID [Name of application]
+		- version [current version]
+		- packaging
+	-> Dependencies
+	-> Build
+	     -> plugins
+		 -> Directory structure
+    -> repositories
+	
+	
+*)The Maven Assembly Plugin allows users to package the project output with its dependencies, modules, site documentation, and other files into a single distributable archive.
+
+$ cd simple-app
+$ mvn assembly:single -DdescriptorId=src
+
+Uber Jar -> While covering assembly, Maven documentation often uses a term uber-jar. Uber is a German word for above or over and an uber-jar contains not only the project packages and resources but also all its dependencies in one single JAR file.
+
+The assembly plugin provides only basic support for uber-jar and for more control, use Maven Shade Plugin.
+
+
+*)
+PluginManagement element in POM allows to configure plugin in parent POM so that it’s configuration is inherited by all decedent POMs.
+Let’s suppose that all modules of multi-app should be compile as 1.6. One way to do this is configure compiler plugin in both app and util’s POM. Instead, better approach is to use pluginManagement element in top level POM so that all the modules inherits the plugin configuration.
+Add following snippet to multi-app’s pom.xml.
+multi-app/pom.xml
+  ...
+  <build>
+    <pluginManagement>
+       <plugins>
+         <plugin>    
+           <artifactId>maven-compiler-plugin</artifactId>
+           <configuration>
+             <source>1.6</source>
+             <target>1.6</target>
+           </configuration>
+         </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+  
+ *)  Maven Resources Plugin (plugin prefix resources) copies resource files from source directories to output directory
+ 
+ resources:resources
+  Copy resources for the main source code to the main output directory.
+  Always uses the project.build.resources element to specify the resources
+to copy.
+
+resources:testResources
+  Copy resources for the test source code to the test output directory.
+  Always uses the project.build.testResources element to specify the
+resources to copy.
+
+resources:copy-resources
+  Copy resources of the configured plugin attribute resources
+  
+*) How do you configure external dependency i.e,  dependency (JAR file) which is not located in a Maven repository (neiterh local, central or remote repository)?
+A) <dependency>
+  <groupId>mydependency</groupId>
+  <artifactId>mydependency</artifactId>
+  <scope>system</scope>
+  <version>1.0</version>
+  <systemPath>${basedir}\war\WEB-INF\lib\mydependency.jar</systemPath>
+</dependency>
+
+*) How do you configure maven to use file system repositories?
+<repositories>
+    <repository>
+      <id>maven2</id>
+      <name>maven2</name>
+      <url>file:${maven.repo.local}</url>
+    </repository>
+  </repositories>
+  
+  
+
+  
+  
