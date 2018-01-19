@@ -1,0 +1,154 @@
+AWS:
+====
+
+1)IAM :
+What is IAM?
+IAM allows users to manage users and their level of access to AWS console.
+
+What does IAM gives to you?
+-> centralized control of your AWS account.
+-> Shared access to your AWS account.
+-> Granular permission
+-> Identity federation (Including Active Directory, Facebook and Linkeding, etc.,)
+-> Multifactor Authentication
+-> Provide temporary access for users/devices and services when necesary,
+-> Integrate with many different AWS services
+-> supports PCI DCC Compliance
+
+critical Terms :
+-> Users : End user
+-> Groups : A collection of users under one set of permission
+-> Roles : 
+-> Policies (document that defines permission)
+
+*) IAM doesn't have Region, it applies to global
+
+IAM users sign-in link:
+https://260113352831.signin.aws.amazon.com/console
+*) Number you see in above link is account number.
+*)we can customize the above link
+
+*) root account is the email account you use to sign up.
+
+*)Two types of MFA device? Virtual and Hardware
+
+*) You can access AWS in two different ways :
+->Management console
+-> Programatic access
+Enables access key id and secret access
+
+-> To access programatically, you need access key id and secret access key
+-> Not login to console
+
+->If you don't want users to programatically access - Make "inactive" for access key id in securty credentials of user.
+
+-> To regenerate keys by clicking "Create Access key"
+
+Roles :
+Roles are secure way to grant permissions to entities that you trust
+e.g : EC2 to talk with S3
+
+Security Token Service :(sysops and developer)
+-> It grants users limited and temporary access to AWS resources.
+Three sources -
+1) Federation (typically Active Directory)
+2) Federation with Mobile Apps (Use Facebook/Amazon/Google)
+3)Cross Account access (Users from one account access another account)
+
+Federation
+
+Identity Broker 
+
+Identity Store
+
+Identities
+
+
+Scenario :
+You are hosting a company website on some EC2 web servers in your VPC. Users of that website must log in to the site which then authenticates against company active directory servers which are based on site on company head quaters. Your VPC is connected to Company HQ via Secure IPSEC VPN. Once loged in user can only have access to thier own S3 bucket. How do you set this up?
+
+-> Employees enters username and passwd
+-> application calls an identity broker. Broker captures the username and passwd.
+-> Identity Broker 
+
+1) Develop Identity broker to communicate with LDAP and AWS STS
+2) Identity broker always authenticates with LDAP first and then with STS
+3) Application then gets temporary access to AWS resources
+
+Scenario 2:
+1) Develop Identity broker to communicate with LDAP and AWS STS
+2) Identity broker always authenticates with LDAP first and then gets IAM role assosiated with the user
+3) Application then authenticates with STS and assumes that IAM role
+4) Application uses that IAM role to interact with S3
+
+q) How do you federate Active directory with LDAP?
+
+2) Can you authenticate with Active directory?
+Yes, using SAML
+What type of authentication?
+SAML
+
+q)Whther or not active direcory first or temporary crendtials first?
+You always authenticaticate active directory first
+
+*) WebIdentity federation with Mobile Application?
+->Authenticate with identity provider
+-> Temporary security credentials
+-> call AssumeRoleWith WebIdentity
+-> Now you will be able to access AWS resources
+
+
+Summary :
+========
+1)IAM consists of following things :
+ ->Users
+ ->Groups (A way to group our users and apply policies to them collectively)
+ -> Roles
+ -> Policy document (Made of JSON, key value pair -> 
+    {Version : 2012-10-17,
+	 Statement : {
+	  Effect : Allow
+	  Action : *
+	  Resource : *
+	 }
+
+
+- IAM is universal, It doesnot apply to regions at this time.
+- The root account is simply the account created when first setup your AWS account. It has complete Admin access.
+- New user has no permission first created.
+- You can use Accesskey and secret access key not to login to console, Instead you can use them access via API's and CLI
+- If you lose them, you have to regenerate them 
+- Always setup MFA on your root account
+- you can customize passwdd rotation policy
+
+What is the name of the API call to request temporary security credentials from the AWS platform when federating with Active Directory?
+a) AssumeRoleWithSAML
+
+When using active directory to authenticate to AWS what are the correct steps performed?
+
+
+When using active directory to authenticate to AWS what are the correct steps performed?
+A)
+1) The user navigates to the ADFS webserver, 2)User enters single Sign On on credentials 3) Users browser recieves SAML assertion from AD server 4) User browser then posts the SAML assertion to the SAML endpoint  and AssumeRoleWithSAML API 	request is used to request temporary security credentials 5) User is able to access 	AWS console
+
+SAML stands for Security Assertion Markup Language.
+
+The AWS sign-in endpoint for SAML is https://signin.aws.amazon.com/saml
+
+Q)When using Web Identity Federation to allow a user to access an AWS service (such as an S3 bucket) what is the correct order of steps?
+
+A)1) A user authenticates with facebook first. They are then given an ID token by facebook. An API call called AssumeRoleWithWebIdentity is then used in conjunction with the ID token. A user is then granted temporary security credentials.
+
+
+=======================================================================================
+
+IAM roles are a secure way to grant permissions to entities that you trust. 
+- Application code running on an EC2 instance that needs to perform actions on AWS resources
+- An AWS service that needs to act on resources in your account to provide its features
+- Users from a corporate directory who use identity federation with SAML
+
+Q: Can I associate an IAM role with an already running EC2 instance?
+Yes. You can assign a role to an EC2 instance that is already running.
+
+Q: Can I associate more than one IAM role with an EC2 instance?
+No. You can only associate one IAM role with an EC2 instance at this time. This limit of one role per instance cannot be increased.

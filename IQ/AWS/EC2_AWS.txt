@@ -1,0 +1,224 @@
+AWS : EC2 (Elastic Compute Cloud)(Soluton archtect, sys admin, developer)
+
+Read FAQ
+
+EC2 is a webservice that provide resizable compute capacity in the cloud.
+EC2 reduces the time require to obtain and boot new server instance to minutes, allowing you to quickly scale capacity up and down as per requirement.
+(VM's in cloud)
+
+EC2 Options :
+==========
+1)OnDemand : allow you to pay a fixed rate by the hour (or a second) with no commitment (Right now by the seconds)
+2) Reserved : Provide you with capacity reservation and offers significant discount (1 Year 3 months)
+3) Spot : Enable to bid whatever price you want for instance capacity
+4) Dedicated hosts : Physical Ec2 server dedicated for your use, help you reduce costs by allowing 
+
+Usecase :
+=========
+1) OnDemand :
+Users that want low costs and flexibility of Amazon EC2 without up-front payment or long term commitment.
+Application with short term or unpredictable work load
+Application being developed and tested on Ec2 for first time
+
+2)Reserved :
+Application with steady state or predictable usage
+Application that requires reserved capacity
+Users able to make upfront payments to reduce their total computing costs
+-->Standard RI's
+-->Converatble RI's
+-->Schedule RI's
+
+3) Spot :
+Application's that have flexibile start and end time
+Application's that are only feaasible at very low compute prize.
+Users wih urgent computing needs for large amount of additional capacity
+
+4) Dedicated Hosts :
+
+different EC2 Instance Types :
+==============================
+D2 :
+R4 : Ram
+M4 (Main Choice)
+C4:
+G2 :
+I2 : (IOPS
+f1 :
+T2 :
+P2 :
+X1 : (extreme Ram extreme memory)
+
+To Remember (Dr Mc GIFT PX)
+D - Density - D2
+R - RAM -  R4
+M - Main choice for general purpose -  M4
+C - Compute -  C4 
+G - Graphics -  G2
+I - IOPS -  I2
+F - FPGA -  F1
+T - Cheap general purpose-  T2
+P - Graphics (think pics)-  P2
+X - Extreme memory - X1
+
+
+
+EBS : (Elastic Block Storage)
+==============================
+Allows you to create storage volumes and attach them to EC2 instance.
+Once attached you can create filesystem on top of it, run database.
+EBS volumes are placed in specific Availability zone
+
+Different EBS volume types :
+1) General Purpose SSD (GP2) :
+ - balance both performance and prize 
+ - 3 IOPS per GB with up to 10000 IOPS and ability to burst up to 3000 IOPS for extended periods 
+  - Most often used
+2) Provisioned IOPS SSD (IO1) :
+   - Designed for I/O intensive applications such as relational and NoSQL database.
+   - Use if you need more than 10,000 IOPS
+   - Can provision up to 20,000 IOPS per volume.
+3)Thorughput Optimized HDD (ST1) :
+   - Big Data
+   - Data warehousing
+   - Long processing
+   - cannot be a boot volume
+4) Cloud HDD (SC1) :
+   - Lowest cloud storage for infrequent accessed workloads
+   - file servers
+   - cannot be a boot volume
+5) Magnetic (Standard)
+   - Lowest cost per GB of all EBS volume types that is bootable.
+   - Magnetic volumes are ideal for workloads where data is accessed infrequently, applications where lowest storage cost
+     is important.
+
+Handson :
+===========
+1) Launch EC2 instance
+2) Security Group Basics
+3) Volumes and snapshot
+4) Create an AMI
+5) Loadbalancers and healthcheck
+6) CloudWatch
+7) AWS command line 
+8) IAM roles with EC2
+9) Bootstrap scripts
+10) Launch configuration Groups
+11) Autoscalling 101
+12) EFS
+13) Lambda concepts
+14) Build a serverless webpage with lambda and API gateway
+15) Build a serverless  webpage with polly
+
+*) Differences betwen onDemand, spot and reserved hosts? what pricing model to use?
+*) EBS consists of
+SSD General Purpose -GP2 (Up to 10,000 IOPS)
+SSD Provisioned IOPS - IO1 - (More than 10,000 IOPS)
+HDD throughput optimized, ST1 - frequently accessed workloads
+HDD cold - SC1 - infrequently accessed
+HDD Magnetic - Standard - cheap, infrequently accessed
+
+	 
+*) You cannot mount 1 EBS volume to multple EC2 instances,instead use EFS
+
+*) 3 Types of root volumes : IO1, GP2, Magnetic
+
+q) What happens to EBS volume attached to EC2 when ec2 is deleted?
+Will be deleted if "Delete on Termination" checkbox is on.
+
+Volume is the virtual harddisk in the cloud.
+
+*)Security Group is a virtual firewall
+ - is a set of firewall rules that control traffic of your instance
+ - What kind of traffic you want to allow
+
+How to ssh :
+---------
+Copy .pem file to one folder.
+ssh ec2-user@<publicIP> -i MyEc2KeyPair.pem
+
+*)Termination protection is turned off by default, you must turn it on.
+ 
+ 
+Security Group : It is a virtual firewall controlls traffic to your instance.
+1 instance can have multiple security groups.
+As soon as you add inbound rules, outbound rules will be added immedieately.
+
+You cannot deny traffic using security groups.
+
+======
+Imp :
+======
+All inbound traffic is blocked by default.
+All Outbound is allowed.
+Changes to security groups take immedieately.
+You can have any number of EC2 instances within security groups
+You can have multiple security groups attached to EC2 instance.
+Security groups are stateful (If you create an an inbound rule allowing traffic in, that traffic is allowed back out again)
+Network access control list are stateless.
+You cannot block specific ip address using security groups instead use Network access list.
+You can specify allow rules, but not deny rules.
+
+EBS Volume Types :
+===================
+Whether or not Ec2 instance in one availability zone and EBS volume in another availability zone?
+No, EC2 and EBS volume should be in one availability zone.
+
+We cannot modify Standard Magnetic Volume.
+
+q)EC2 instance in one availability zone (eg, eu-west-2a), create another Ec2 instance or another volume in another availability zone, how do we do that?
+->Take a snapshot of EC2 volume
+
+
+*)Snapshot copy will allow to move to different region
+
+q) How to move Ec2 instance from one region to another region?
+->Copy snapshot of volume from one region to another region
+->Create image of that snapshot
+
+*) snapshot are typically used for backups, images are typically used to create new Ec2 volumes.
+
+
+--
+*) Volumes exists on EBS
+*) Snapshot exists on S3
+*) Snapshot are point in time copies of volumes
+*)Snapshots are incremental - this means the blocks that have changed since your last snapshot are moved to s3.
+*) To create snapshot of EBS volume that serves as root, you should stop the instance before taking snapshot.
+*) You can create AMI for both Volumes and Snapshots.
+*) you can change the volume size on the fly
+*) Volumes will always in the same availability zone as Ec2
+*) to move an EC2 volume from one zone to another, take a snap or image, then copy to new zone
+*) snapshot of encrypted volume are encrypted automatically
+*) you can share snapshot only if it is unencrypted.
+
+
+
+==============
+EFS :
+==============
+Elastic file system is a file storage service for EC2 instances.
+- create and configure file systems quickly and easily.
+- storage capacity is elastic, growing and shrinking automatically as you add and remove files.
+
+*) supports NFSv4 protocol
+*) you only pay the storage you use.
+*) can scale up the peta bytes
+*) block based storage
+*) Read after write consistency
+*) Can support thousands of concurrent NFS connection
+
+
+
+AWS CLI - ROLES :
+==================
+
+*) Whether or not you will be able to attach IAM roles to the running instance?
+Yes	
+
+
+aws ec2 run-instances --image-id ami-d5c18eba --count 1 --instance-type t2.micro --key-name MyEc2KeyPair --security-group-ids sg-816852e9
+
+
+
+
+ 
