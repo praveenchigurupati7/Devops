@@ -68,3 +68,28 @@ for my $key (keys %hash){
         print "$key:", $hash{$key}, "\n";
 
 }
+
+3) How to find and replace a string in a file?
+
+Here's the contents of myfiletemplate.txt:
+
+CATEGORY1=youknow_<PREF>  
+CATEGORY2=your/<PREF>/goes/here/
+
+#!/usr/bin/perl -w
+
+use strict;
+
+open(FILE, "</tmp/yourfile.txt") || die "File not found";
+my @lines = <FILE>;
+close(FILE);
+
+my @newlines;
+foreach(@lines) {
+   $_ =~ s/<PREF>/ABCD/g;
+   push(@newlines,$_);
+}
+
+open(FILE, ">/tmp/yourfile.txt") || die "File not found";
+print FILE @newlines;
+close(FILE);
