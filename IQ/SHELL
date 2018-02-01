@@ -1,0 +1,22 @@
+#This file is for questions on Shell
+#scripts
+#
+#
+
+awk:
+==================
+
+q) how to print last field in a file?
+ex: cat /etc/passwd | awk -F ':' '{print $NF}'
+
+
+
+find:
+===================
+q) how to find a largest file in a directory?
+du -a * | sort -n -r | head -1
+
+grep:
+===================
+q) how to find number of occurenses of a string in recurrsive directories?
+grep -oIr "praveen" . | wc -l
