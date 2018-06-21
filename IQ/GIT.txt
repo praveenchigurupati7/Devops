@@ -115,3 +115,17 @@ large file storage
 20) How to delete branch and tag in git?
 git branch -d <delete>
 git push origin :banchName
+
+21) How to clone a specific folder in git?
+mkdir git1
+cd git1/
+git init
+git remote add origin -f https://github.com/varunhyd28/Devops.git
+git config core.sparsecheckout true
+touch .git/info/sparse-checkout <<!--Do it if the file is not created--!>>
+echo "Devops/*" >> .git/info/sparse-checkout
+echo "Ansible" >> .git/info/sparse-checkout
+git pull origin master 
+
+22) how to create a bare repository?
+git init --bare
