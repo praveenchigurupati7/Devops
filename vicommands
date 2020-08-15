@@ -23,6 +23,7 @@ B : Positions cursor to previous word.
 ) : Positions cursor to beginning of next sentence.
 H : Move to top of screen.
 nH : Moves to nth line from the top of the screen.
+G : Moves to last line from the top of the screen.
 M : Move to middle of screen.
 L : Move to bottom of screen.
 nL : Moves to nth line from the bottom of the screen.
@@ -67,8 +68,9 @@ Dw : Deletes from the current cursor location to the next word.
 d^ : Deletes from current cursor position to the beginning of the line.
 d$ : Deletes from current cursor position to the end of the line.
 Dd : Deletes the line the cursor is on.
-Copy and Past Commands: Copy lines or words from one place and paste them on another place by using the following commands.
 
+Copy and Past Commands: Copy lines or words from one place and paste them on another place by using the following commands.
+================================================================================================================================
 Yy : Copies the current line.
 9yy : Yank current line and 9 lines below.
 p : Puts the copied text after the cursor.
